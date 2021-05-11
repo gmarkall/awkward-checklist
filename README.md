@@ -205,10 +205,15 @@ Runtime (NRT) for reference counting, which is not supported on the CUDA target
 general problem.
 
 
-## To investigate
+## Iterators
 
-Items from the original list that need investigation:
+**Requirement:**: Allow the use of `SimpleIteratorType` with an
+`EphermeralPointer` to an `intp` type with:
 
-- [ ] `SimpleIteratorType` (has an `EphemeralPointer(nb.intp)`) with `@nb.core.typing.templates.infer` for key `"getiter"` and `@nb.extending.lower_builtin("getiter", ...)`/`@nb.extending.lower_builtin("iternext", ...)`/`@nb.core.imputils.iternext_impl(RefType.BORROWED)`.
+- [X] `@nb.core.typing.templates.infer` for key `"getiter"`
+- [X] `@nb.extending.lower_builtin("getiter", ...)`
+- [X] `@nb.extending.lower_builtin("iternext", ...)`
+- [X] `@nb.core.imputils.iternext_impl(RefType.BORROWED)`.
 
-
+**Description of support:** These should all work as I believe they are used
+for iterating over various things already.
