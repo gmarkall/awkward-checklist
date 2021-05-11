@@ -5,9 +5,11 @@
 **Requirement:** `@nb.extending.register_model` for StructModels that:
 
 - [X] contain numeric types 
-- [ ] `nb.types.Array`,
-- [ ] one of which contains a `nb.types.pyobject`, but it's only used to track a
-  reference, not use it in the Python API.
+- [X] `nb.types.Array` - will probably work for having an array as a struct
+  member.
+- [X] one of which contains a `nb.types.pyobject`, but it's only used to track a
+  reference, not use it in the Python API. *this should be OK as long as it's
+  not accessed*.
 
 **Description of support:** Models registered with `register_model` are already
 supported by the CUDA target, and are used in its
@@ -80,7 +82,7 @@ a StructModel should work.
 
 **Description of support:** Overloading an operator should work - support for
 overloads in the CUDA was added in May 2021 and is tested by the code in
-[`numba.cuda.tests.cudapy.test_overload](https://github.com/numba/numba/blob/master/numba/cuda/tests/cudapy/test_overload.py).
+[`numba.cuda.tests.cudapy.test_overload`](https://github.com/numba/numba/blob/master/numba/cuda/tests/cudapy/test_overload.py).
 
 
 ## Memory allocation
@@ -199,7 +201,7 @@ and many are used in the CUDA target.
 **Description of support:**: This functions just returns its argument, so it
 will work. However, the use of this does imply a general reliance on the Numba
 Runtime (NRT) for reference counting, which is not supported on the CUDA target
-(see [Memory Allocation] above) so this may point to a general problem.
+(see [Memory allocation] above) so this may point to a general problem.
 
 
 ## To investigate
