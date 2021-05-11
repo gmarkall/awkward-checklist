@@ -1,4 +1,12 @@
-# Checklist of items needed for Numba CUDA to support Awkward Arrays
+#  Requirements for supporting Awkward Arrays in Numba CUDA
+
+## Summary
+
+* Many of the requirements are already implemented or supported on the CUDA target.
+* Major items that are not yet supported:
+  - [ ] Boxing / unboxing
+  - [ ] Memory allocation / reference counting / NRT
+
 
 ## `@numba.extending.register_model`
 
