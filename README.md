@@ -2,9 +2,51 @@
 
 ## `@numba.extending.register_model`
 
-- [ ] `@nb.extending.register_model` for StructModels that contain numeric types and `nb.types.Array`, one of which contains a `nb.types.pyobject`, but it's only used to track a reference, not use it in the Python API.
-- [ ] Boxing and unboxing these objects.
-- [ ] `@nb.extending.lower_builtin`
+**Requirement:** `@nb.extending.register_model` for StructModels that:
+
+- [X] contain numeric types 
+- [ ] `nb.types.Array`,
+- [ ] one of which contains a `nb.types.pyobject`, but it's only used to track a
+  reference, not use it in the Python API.
+
+**Description of support:** Models registered with `register_model` are already
+supported by the CUDA target, and are used in its
+[`models`](https://github.com/numba/numba/blob/master/numba/cuda/models.py)
+module.
+
+## Boxing and unboxing
+
+**Requirement:** objects described by the registered models should be supported by:
+
+- [ ] Boxing
+- [ ] Unboxing
+
+**Description of support:** Presently there is no support for boxing and
+unboxing.  Further, the CUDA target argument preparation will only accept
+objects which it knows about - see the
+[`prepare_args()`](https://github.com/numba/numba/blob/6b82cd7b508b17d9eeb48e54f22dd18c67b711a2/numba/cuda/compiler.py#L744)
+function. You can register an extension that maps anopther type to types that it
+knows about.
+
+**Question:** Can registering an extension that maps an Awkward Array to a type
+that Numba knows about provide a workaround for the Boxing / Unboxing
+requirement?
+
+# `@numba.extending.lower_builtin`
+
+**Requirement:** A way to register lowering with:
+
+- [X] `@nb.extending.lower_builtin` 
+
+**Description of support:** This *probably* works already by importing
+`numba.cuda.cudaimpl.registry as cuda_registry` and then using
+`@cuda_registry.lower_builtin` - other extensions and the target use the `lower`
+and `lower_attr` methods of this registry for lowering.
+
+## To investigate
+
+Items from the original list that need investigation:
+
 - [ ] `@nb.core.typing.templates.infer_global(operator.getitem)` and optionally all the other operators, `[abs, operator.inv, operator.invert, operator.neg, operator.not_, operator.pos, operator.truth, operator.add, operator.and_, operator.contains, operator.eq, operator.floordiv, operator.ge, operator.gt, operator.le, operator.lshift, operator.lt, operator.mod, operator.mul, operator.ne, operator.or_, operator.pow, operator.rshift, operator.sub, operator.truediv, operator.xor, operator.matmul]`, for `nb.core.typing.templates.AbstractTemplate`.
 - [ ] Also, `@nb.core.typing.templates.infer_global(len)`
 - [ ] `@nb.core.typing.templates.infer_getattr` for methods and properties
