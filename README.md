@@ -201,8 +201,7 @@ and many are used in the CUDA target.
 **Description of support:**: This functions just returns its argument, so it
 will work. However, the use of this does imply a general reliance on the Numba
 Runtime (NRT) for reference counting, which is not supported on the CUDA target
-(see [Memory allocation](Memory allocation) above) so this may point to a
-general problem.
+(see (#memory-allocation) above) so this may point to a general problem.
 
 
 ## To investigate
