@@ -64,6 +64,7 @@ overloads in the CUDA was added in May 2021 and is tested by the code in
 
 - [ ] `@nb.extending.lower_builtin(np.asarray, ...)`
 - [ ] `@nb.extending.overload(np.array)`
+- [ ] `@nb.extending.type_callable(np.asarray)`
 
 **Description of support:** It looks like `@overload(np.array)` and
 `@lower_builtin(np.asarray)` refer to the construction of arrays - memory
@@ -107,6 +108,36 @@ these allocations in kernels?
 CUDA target.
 
 
+## `cgutils` module
+
+**Requirement:** The following utility functions:
+
+- [X] `cgutils.is_not_null` (for boxing),
+- [X] `cgutils.increment_index`
+- [X] `cgutils.pointer_add`
+- [X] `cgutils.alloca_once_value`
+- [X] `cgutils.as_bool_bit`
+- [X] ` cgutils.for_range`
+- [X] ` cgutils.false_bit`
+- [X] ` cgutils.get_null_value`
+- [X] `cgutils.true_bit`
+
+**Description of support:** These are all convenience functions for building IR,
+and many are used in the CUDA target.
+
+
+## `imputils` module
+
+**Requirement:**: The following utility function:
+
+- [X] `imputils.impl_ret_new_ref`
+
+**Description of support:**: This functions just returns its argument, so it
+will work. However, the use of this does imply a general reliance on the Numba
+Runtime (NRT) for reference counting, which is not supported on the CUDA target
+(see [Memory Allocation] above) so this may point to a general problem.
+
+
 ## To investigate
 
 Items from the original list that need investigation:
@@ -116,10 +147,9 @@ Items from the original list that need investigation:
 - [ ] `@nb.core.typing.templates.infer_getattr` for methods and properties
 - [ ] `@nb.extending.lower_getattr_generic`
 - [ ] `SimpleIteratorType` (has an `EphemeralPointer(nb.intp)`) with `@nb.core.typing.templates.infer` for key `"getiter"` and `@nb.extending.lower_builtin("getiter", ...)`/`@nb.extending.lower_builtin("iternext", ...)`/`@nb.core.imputils.iternext_impl(RefType.BORROWED)`.
-- [ ] `@nb.extending.type_callable(np.asarray)`
 - [ ] `@nb.core.imputils.lower_constant` for a `StructModel`
 - [ ] Things in the context that I use: `[make_helper, make_constant_array, if enable_nrt, incref/decref (only in boxing), get_constant, get_value_type, make_tuple, compile_internal, get_dummy_value, unify_types]`.
 - [ ] Things in the context that I use, but I don't expect it to work in CUDA: `[add_dynamic_addr, call_conv.return_user_exc, get_python_api, get_function_pointer_type, call_function_pointer]`.
-- [ ] Things in nb.core that I use (other than typing): `[cgutils.is_not_null (boxing), imputils.impl_ret_new_ref, cgutils.increment_index, cgutils.pointer_add, alloca_once_value, cgutils.as_bool_bit, cgutils.for_range, cgutils.false_bit, cgutils.get_null_value, cgutils.true_bit]`.
+- [ ] Things in nb.core that I use (other than typing): `[  `.
 
 
