@@ -21,6 +21,7 @@ module.
 
 - [ ] Boxing
 - [ ] Unboxing
+- [ ] `incref` / `decref` - presumably from `numba.core.pythonapi`
 
 **Description of support:** Presently there is no support for boxing and
 unboxing.  Further, the CUDA target argument preparation will only accept
@@ -34,17 +35,41 @@ that Numba knows about provide a workaround for the Boxing / Unboxing
 requirement?
 
 
-## `@numba.extending.lower_builtin`
+## Typing
+
+**Requirement:** register typing for operators, functions, methods, and attributes:
+
+
+- [X] `@nb.core.typing.templates.infer_global(operator.getitem)` using an
+  `AbstractTemplate` and optionally all the other operators:
+  - `abs`, `operator.inv`, `operator.invert`, `operator.neg`, `operator.not_`,
+    `operator.pos`, `operator.truth`, `operator.add`, `operator.and_`,
+    `operator.contains`, `operator.eq`, `operator.floordiv`, `operator.ge`, `operator.gt`,
+    `operator.le`, `operator.lshift`, `operator.lt`, `operator.mod`, `operator.mul`,
+    `operator.ne`, `operator.or_`, `operator.pow`, `operator.rshift`, `operator.sub`,
+    `operator.truediv`, `operator.xor`, `operator.matmul`
+- [X] `@nb.core.typing.templates.infer_global(len)`
+- [X] `@nb.core.typing.templates.infer_getattr` for methods and properties
+
+**Description of support:** typing is generally well-supported for the CUDA
+target and there are no limitations on what can be typed (often the tricky
+things happen in lowering instead!)
+
+
+## Lowering
 
 **Requirement:** A way to register lowering with:
 
 - [X] `@nb.extending.lower_builtin` 
 - [X] `@nb.extending.lower_builtin(operator.getitem, ...)`
+- [X] `@nb.extending.lower_getattr_generic`
+- [X] `@nb.core.imputils.lower_constant` for a `StructModel`
 
-**Description of support:** This *probably* works already by importing
+**Description of support:** The first three *probably* work already by importing
 `numba.cuda.cudaimpl.registry as cuda_registry` and then using
 `@cuda_registry.lower_builtin` - other extensions and the target use the `lower`
-and `lower_attr` methods of this registry for lowering.
+and `lower_attr` methods of this registry for lowering. Lowering a constant for
+a StructModel should work.
 
 
 ## `@numba.extending.overload`
@@ -72,6 +97,45 @@ allocation is not presently supported in CUDA, so this is a big hurdle.
 
 **Question:** Is the above description correct? If so, is it necessary to have
 these allocations in kernels?
+
+
+## Typing context methods
+
+**Requirement:** Unify a set of types using the method:
+
+- [X] `unify_types`
+
+**Description of support:** Already used in the CUDA target and by other
+extensions.
+
+
+## Target context methods
+
+**Requirement:** 
+
+- [X] `make_helper`,
+- [X] `make_constant_array - if this doesn't work some alternative will be available.
+- [ ] `if enable_nrt` - NRT will not be available
+- [X] `get_constant`,
+- [X] `get_value_type`,
+- [X] `make_tuple`,
+- [X] `compile_internal`,
+- [X] `get_dummy_value`
+
+**Description of support:** Generally used within the CUDA target or will be
+available for use, apart from the exception noted above
+
+**Not expected to work, but used for the CPU:**
+
+- [ ] `add_dynamic_addr` - may work
+- [ ] `call_conv.return_user_exc` - may work
+- [ ] `get_python_api`
+- [ ] `get_function_pointer_type`
+- [ ] `call_function_pointer`
+
+**Description of support:** There is some exception support on CUDA, and the
+implementation of `add_dynamic_addr` looks like it might compile. The last three
+functions pertain to unsupported functionality in CUDA.
 
 
 ## Builder functions:
@@ -142,14 +206,6 @@ Runtime (NRT) for reference counting, which is not supported on the CUDA target
 
 Items from the original list that need investigation:
 
-- [ ] `@nb.core.typing.templates.infer_global(operator.getitem)` and optionally all the other operators, `[abs, operator.inv, operator.invert, operator.neg, operator.not_, operator.pos, operator.truth, operator.add, operator.and_, operator.contains, operator.eq, operator.floordiv, operator.ge, operator.gt, operator.le, operator.lshift, operator.lt, operator.mod, operator.mul, operator.ne, operator.or_, operator.pow, operator.rshift, operator.sub, operator.truediv, operator.xor, operator.matmul]`, for `nb.core.typing.templates.AbstractTemplate`.
-- [ ] Also, `@nb.core.typing.templates.infer_global(len)`
-- [ ] `@nb.core.typing.templates.infer_getattr` for methods and properties
-- [ ] `@nb.extending.lower_getattr_generic`
 - [ ] `SimpleIteratorType` (has an `EphemeralPointer(nb.intp)`) with `@nb.core.typing.templates.infer` for key `"getiter"` and `@nb.extending.lower_builtin("getiter", ...)`/`@nb.extending.lower_builtin("iternext", ...)`/`@nb.core.imputils.iternext_impl(RefType.BORROWED)`.
-- [ ] `@nb.core.imputils.lower_constant` for a `StructModel`
-- [ ] Things in the context that I use: `[make_helper, make_constant_array, if enable_nrt, incref/decref (only in boxing), get_constant, get_value_type, make_tuple, compile_internal, get_dummy_value, unify_types]`.
-- [ ] Things in the context that I use, but I don't expect it to work in CUDA: `[add_dynamic_addr, call_conv.return_user_exc, get_python_api, get_function_pointer_type, call_function_pointer]`.
-- [ ] Things in nb.core that I use (other than typing): `[  `.
 
 
