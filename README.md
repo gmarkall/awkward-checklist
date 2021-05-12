@@ -3,9 +3,41 @@
 ## Summary
 
 * Many of the requirements are already implemented or supported on the CUDA target.
-* Major items that are not yet supported:
-  - [ ] Boxing / unboxing
-  - [ ] Memory allocation / reference counting / NRT
+* Items that are not implemented / supported turn out not to be needed.
+* Therefore, it should be possible to proceed with an Awkard Numba CUDA
+  extension based on Numba's present capabilities.
+
+
+## Unneeded / unuspported items
+
+These items are used on the CPU, but are not needed for CUDA.
+
+### Boxing
+
+Boxing is needed when returning Awkward Arrays from jitted functions. However,
+there are no return values from kernels, so this will not be needed (any outputs
+must be passed in as kernel arguments).
+
+
+### Unboxing
+
+Unboxing is needed on the CPU to pass Awkward Arrays into jitted functions. For
+the CUDA implementation, an extension can be registered for the
+`_prepare_args()` function to call that converts and Awkward Array into a
+primitive type or multiple primitively-typed arguments that the lowered code in
+the kernel expects to receive. There are various ways in which this might be
+done - for example, the Awkward Array might be passed as an `intp` to a
+structure that is represented by a `StructModel`, or it might be passed as a
+struct that is split into an `intp` and an integer, where the calling convention
+glues this back into a struct for a `StructModel` inside the kernel code.
+
+### Memory allocation / reference counting / NRT
+
+These are needed in the case when a new Awkward Array is created by a jitted
+function. Typically these would be returned from the jitted function - again
+there are no return values from kernels, so this use case is not required. It is
+not typical for temporary Awkward Arrays to be allocated and then freed in
+jitted code either, so support for this use case is not required.
 
 
 ## `@numba.extending.register_model`
